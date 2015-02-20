@@ -9,7 +9,7 @@ It implements the CBC encryption scheme as in pcrypt.c
 
 Modules:
 
-    c_types_defines : Defines ctypes structures
+    c_types_defines : Defines ctype structures
     termcolor       : For printing out colored text, $pip install termcolor
 
 """
@@ -151,7 +151,7 @@ def main():
     bufrecv_enc = pencrypt(bufrecv, len(bufrecv)) # Try encrypting
 
     # Populate bot_info structure
-    bot_info.ip = "\254\020\323\001"
+    bot_info.ip = "\254\020\323\001" # char[4]
     bot_info.have_ip = 1
     bot_info.bufrecv = bufrecv_enc
     bot_info.bufsize = 32
@@ -226,23 +226,23 @@ def main():
             cmd = ord(rcvmsg[0])
 
             if   cmd == RC_SLEEP:
-                cprint("RC_SLEEP", "cyan")
+                cprint("RC_SLEEP",      "cyan")
             elif cmd == RC_GETWORK:
-                cprint("RC_GETWORK", "cyan")
+                cprint("RC_GETWORK",    "cyan")
             elif cmd == RC_RESTART:
-                cprint("RC_RESTART", "cyan")
+                cprint("RC_RESTART",    "cyan")
             elif cmd == RC_UPDATE:
-                cprint("RC_UPDATE", "cyan")
+                cprint("RC_UPDATE",     "cyan")
             elif cmd == RC_BID:
-                cprint("RC_BID", "cyan")
+                cprint("RC_BID",        "cyan")
             elif cmd == RC_TEMPLATE:
-                cprint("RC_TEMPLATE", "cyan")
+                cprint("RC_TEMPLATE",   "cyan")
             elif cmd == RC_CONFIG:
-                cprint("RC_CONFIG", "cyan")
+                cprint("RC_CONFIG",     "cyan")
             elif cmd == RC_MAILFROM:
-                cprint("RC_MAILFROM", "cyan")
+                cprint("RC_MAILFROM",   "cyan")
             elif cmd == RC_ACCOUNTS:
-                cprint("RC_ACCOUNTS", "cyan")
+                cprint("RC_ACCOUNTS",   "cyan")
 
 	    print hexdump(rcvmsg)
 
