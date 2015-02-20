@@ -62,7 +62,8 @@ def main():
     # Connect
     s.connect((HOST, PORT))
 
-    cprint("\n[*] Sending data to " + HOST + " : " + str(PORT) + " (hexdump below)\n", "green")
+    cprint("\n[*] Sending data to " + HOST + " : " + str(PORT) \
+            + " (hexdump below)\n", "green")
 
     # Initialise bot_info, bot_rheader, botbulk_info structures
     bot_info = BOT_INFO()
@@ -71,9 +72,9 @@ def main():
 
     # Populate bot_rheader structure
     bot_rheader.bid     = 0
-    bot_rheader.iplocal = 2886783745 # Should be INT
+    bot_rheader.iplocal = 30609580 # Should be INT
     bot_rheader.botver  = 116
-    bot_rheader.confver = 1
+    bot_rheader.confver = 198
     bot_rheader.mfver   = 1
     bot_rheader.winver  = 1
     bot_rheader.flags   = 1
@@ -81,18 +82,16 @@ def main():
     bot_rheader.size    = 32
 
     # Conversion: Structure -> Bytes (Str)
-    #bot_info.bufrecv = buffer(bot_rheader)[:] # Same as pack()
-    bufrecv = buffer(bot_rheader)[:]
-    bufrecv_enc = pencrypt(bufrecv, len(bufrecv)) # Try encrypting
+    bot_info.bufrecv = buffer(bot_rheader)[:] # Same as pack()
 
     # Populate bot_info structure
     bot_info.ip                 = "\254\020\323\001" # char[4]
     bot_info.have_ip            = 1
-    bot_info.bufrecv            = bufrecv_enc
     bot_info.bufsize            = 32
     
     """
     bot_info.bufsend            = ""
+    bot_info.bufrecv            = ""
     bot_info.bufdata            = ""
     bot_info.bufsmall           = 10000
 
@@ -135,9 +134,10 @@ def main():
     bot_info.refbulk_size       = 0
     """
 
-    # Send
-    print hexdump(buffer(bot_info)[:])
-    s.sendall(buffer(bot_info)[:])
+    # Send data (BOT_RHEADER followed by BOT_INFO)
+    data = buffer(bot_rheader)[:] + buffer(bot_info)[:]
+    print hexdump(data)
+    s.sendall(data)
     cprint("[+] Sent! Now waiting to receive data...\n", "green")
 
     # Initialise recv buffer
@@ -190,12 +190,13 @@ def main():
             # Let's check out the contents of recv buffer (if not empty)
             if buf:
                 # Decrypt recv buffer
-                dec = pdecrypt(buf, len(buf))
-                print "[+] Decrypted:\n", dec, "\n"
+                #dec = pdecrypt(buf, len(buf))
+                #print "[+] Decrypted:\n", dec, "\n"
 
                 # Clear recv buffer
                 buf = ""
-                cprint("[*] Listening for incoming data (press Ctrl+C to quit)\n", "green")
+                cprint("[*] Listening for incoming data (press Ctrl+C to quit)\n" \
+                        , "green")
             
             # DoS attack
             #s.sendall(buffer(bot_info)[:] * 100)

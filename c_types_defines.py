@@ -1,5 +1,16 @@
 # c_types_defines.py
 
+"""
+Description:
+
+This program implements the following ctype structures:
+
+    BOT_RHEADER     : from globals.h:24
+    BOTBULK_INFO    : from spcntrl.h:111
+    BOT_INFO        : from spcntrl.h:123
+
+"""
+
 from ctypes import *
 
 # General recv header
