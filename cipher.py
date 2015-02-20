@@ -135,15 +135,15 @@ def main():
     botbulk_info = BOTBULK_INFO()
 
     # Populate bot_rheader structure
-    bot_rheader.bid = 0
+    bot_rheader.bid     = 0
     bot_rheader.iplocal = 2886783745 # Should be INT
-    bot_rheader.botver = 116
+    bot_rheader.botver  = 116
     bot_rheader.confver = 1
-    bot_rheader.mfver = 1
-    bot_rheader.winver =1
-    bot_rheader.flags = 1
-    bot_rheader.smtp = 1
-    bot_rheader.size = 32
+    bot_rheader.mfver   = 1
+    bot_rheader.winver  = 1
+    bot_rheader.flags   = 1
+    bot_rheader.smtp    = 1
+    bot_rheader.size    = 32
 
     # Conversion: Structure -> Bytes (Str)
     #bot_info.bufrecv = buffer(bot_rheader)[:] # Same as pack()
@@ -151,53 +151,53 @@ def main():
     bufrecv_enc = pencrypt(bufrecv, len(bufrecv)) # Try encrypting
 
     # Populate bot_info structure
-    bot_info.ip = "\254\020\323\001" # char[4]
-    bot_info.have_ip = 1
-    bot_info.bufrecv = bufrecv_enc
-    bot_info.bufsize = 32
+    bot_info.ip                 = "\254\020\323\001" # char[4]
+    bot_info.have_ip            = 1
+    bot_info.bufrecv            = bufrecv_enc
+    bot_info.bufsize            = 32
     
     """
-    bot_info.bufsend = ""
-    bot_info.bufdata = ""
-    bot_info.bufsmall = 10000
+    bot_info.bufsend            = ""
+    bot_info.bufdata            = ""
+    bot_info.bufsmall           = 10000
 
-    bot_info.id = 0
-    bot_info.bid = 0
-    bot_info.sd = 5
-    bot_info.timer = 2
-    bot_info.state = 2
-    bot_info.blackliststatus = 0
-    bot_info.bshcommand = 0
+    bot_info.id                 = 0
+    bot_info.bid                = 0
+    bot_info.sd                 = 5
+    bot_info.timer              = 2
+    bot_info.state              = 2
+    bot_info.blackliststatus    = 0
+    bot_info.bshcommand         = 0
 
-    bot_info.flags = 0
+    bot_info.flags              = 0
 
-    bot_info.botbulk = pointer(botbulk_info)
+    bot_info.botbulk            = pointer(botbulk_info)
 
     # Statistics
-    bot_info.bsent = 0
-    bot_info.bnouser = 0
-    bot_info.bunlucky = 0
-    bot_info.bunksmtpansw = 0
-    bot_info.bblacklisted = 0
-    bot_info.bmailfrombad = 0
-    bot_info.bgraylisted = 0
-    bot_info.bnomx = 0
-    bot_info.bnomxip = 0
-    bot_info.bnoaliveip = 0
-    bot_info.bsmtptimeout = 0
-    bot_info.bconnect = 0
-    bot_info.brecv = 0
-    bot_info.bbotmailtimeout = 0
-    bot_info.bspammessage = 0
-    bot_info.bnohostname = 0
-    bot_info.blckmx = 0
+    bot_info.bsent              = 0
+    bot_info.bnouser            = 0
+    bot_info.bunlucky           = 0
+    bot_info.bunksmtpansw       = 0
+    bot_info.bblacklisted       = 0
+    bot_info.bmailfrombad       = 0
+    bot_info.bgraylisted        = 0
+    bot_info.bnomx              = 0
+    bot_info.bnomxip            = 0
+    bot_info.bnoaliveip         = 0
+    bot_info.bsmtptimeout       = 0
+    bot_info.bconnect           = 0
+    bot_info.brecv              = 0
+    bot_info.bbotmailtimeout    = 0
+    bot_info.bspammessage       = 0
+    bot_info.bnohostname        = 0
+    bot_info.blckmx             = 0
 
-    bot_info.captcha_good = 0
-    bot_info.captcha_total = 0
+    bot_info.captcha_good       = 0
+    bot_info.captcha_total      = 0
 
     refbulk = (c_byte * 4)()
-    bot_info.refbulk = cast(refbulk, POINTER(c_int))
-    bot_info.refbulk_size = 0
+    bot_info.refbulk            = cast(refbulk, POINTER(c_int))
+    bot_info.refbulk_size       = 0
     """
 
     # Send
