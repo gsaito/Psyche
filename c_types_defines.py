@@ -50,7 +50,7 @@ class BOT_INFO(Structure):
 
 		("botbulk",		POINTER(BOTBULK_INFO)),
 
-		# Stat
+		# Statistics
 		("bsent",		c_longlong),
 		("bnouser",		c_longlong),
 		("bunlucky",		c_longlong),
