@@ -16,6 +16,8 @@ Modules:
 import sys
 import array
 import socket
+import fcntl
+import struct
 
 from cipher import pencrypt, pdecrypt
 from c_types_defines import *
@@ -53,10 +55,22 @@ def hexdump(src, length=16):
 
     return "".join(result)
 
+# Get the IP address for a particular interface
+# [Credit: www.quora.com]
+def get_ip_address(iface):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+                s.fileno(),
+                0x8915, # SIOCGIFADDR
+                struct.pack("256s", iface[:15])
+            )[20:24])
+
 def main():
     # Socket configurations
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #s.setsockopt(socket.SOL_SOCKET, 25, "vmnet8") # SO.BINDTODEVICE (25)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    s.bind((get_ip_address("vmnet8"), 0))
     s.settimeout(3.0) # Set 3s timeout
 
     # Connect
@@ -71,44 +85,45 @@ def main():
     botbulk_info = BOTBULK_INFO()
 
     # Populate bot_rheader structure
-    bot_rheader.bid     = 0
-    bot_rheader.iplocal = 30609580 # Should be INT
+    bot_rheader.bid     = 1
+    bot_rheader.iplocal = 97718444 # Should be INT
     bot_rheader.botver  = 116
     bot_rheader.confver = 198
     bot_rheader.mfver   = 1
     bot_rheader.winver  = 1
-    bot_rheader.flags   = 1
+    bot_rheader.flags   = 0
     bot_rheader.smtp    = 1
     bot_rheader.size    = 32
 
     # Conversion: Structure -> Bytes (Str)
-    bot_info.bufrecv = buffer(bot_rheader)[:] # Same as pack()
+    #bot_info.bufrecv = buffer(bot_rheader)[:] # Same as pack()
 
     # Populate bot_info structure
-    bot_info.ip                 = "\254\020\323\001" # char[4]
+    bot_info.ip                 = "\254\020\323\003" # char[4]
     bot_info.have_ip            = 1
     bot_info.bufsize            = 32
+    bot_info.bid                = 0
+    bot_info.timer              = 1425851228
+    bot_info.state              = 80 # BSTBULKOK
+    bot_info.bshcommand         = RC_UPDATE
+    bot_info.sd                 = 10
+    bot_info.bufsmall           = 0
     
+    bot_info.bsent              = 1
+
     """
     bot_info.bufsend            = ""
     bot_info.bufrecv            = ""
     bot_info.bufdata            = ""
-    bot_info.bufsmall           = 10000
 
     bot_info.id                 = 0
-    bot_info.bid                = 0
-    bot_info.sd                 = 5
-    bot_info.timer              = 2
-    bot_info.state              = 2
     bot_info.blackliststatus    = 0
-    bot_info.bshcommand         = 0
 
     bot_info.flags              = 0
 
     bot_info.botbulk            = pointer(botbulk_info)
 
     # Statistics
-    bot_info.bsent              = 0
     bot_info.bnouser            = 0
     bot_info.bunlucky           = 0
     bot_info.bunksmtpansw       = 0
@@ -130,7 +145,7 @@ def main():
     bot_info.captcha_total      = 0
 
     refbulk = (c_byte * 4)()
-    bot_info.refbulk            = cast(refbulk, POINTER(c_int))
+    bot_info.refbulk            = cast(refbulk, POINTER(c_int)) # NULL
     bot_info.refbulk_size       = 0
     """
 
@@ -142,6 +157,9 @@ def main():
 
     # Initialise recv buffer
     buf = ""
+
+    # Flags
+    skip = False
 
     # Listen on host
     while True:
@@ -181,9 +199,38 @@ def main():
 
 	    print hexdump(rcvmsg)
 
+            # Command actions
+            if cmd == RC_BID:
+                # Decrypt data received
+                dec = pdecrypt(rcvmsg[8:], len(rcvmsg[8:]))
+                cprint("Decryption:\n" + hexdump(dec), "yellow")
+
+                # Extract the BID from the decrypted data
+                bid = struct.unpack("i", dec[0:4]) # Returns a tuple
+
+                # Extract sign.timer from the decrypted data
+                timer = struct.unpack("i", dec[8:12])
+
+                cprint("[+] Assigned BID: " + str(bid[0]) \
+                        + ", Timer: " + str(timer[0]) + "\n", "green")
+
+                # Update BOT_RHEADER and BOT_INFO structures
+                bot_rheader.bid = bid[0]
+                bot_info.bid = bid[0]
+                bot_info.timer = timer[0]
+
+            """
+            if cmd == RC_UPDATE and not skip:
+                cprint("[*] Sending updated data...", "yellow")
+                data = buffer(bot_rheader)[:] + buffer(bot_info)[:]
+                print hexdump(data)
+                s.sendall(data)
+                skip = True
+            """
+
             # Store data in buffer (for later use)
             buf += rcvmsg
-
+        
         except socket.timeout:
 
             # Timed out on receiving data: 
@@ -197,10 +244,7 @@ def main():
                 buf = ""
                 cprint("[*] Listening for incoming data (press Ctrl+C to quit)\n" \
                         , "green")
-            
-            # DoS attack
-            #s.sendall(buffer(bot_info)[:] * 100)
-            
+
     # Close socket
     s.close()
 
