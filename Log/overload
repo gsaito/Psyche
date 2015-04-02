@@ -1,0 +1,73 @@
+52 51081480 543782318 64
+29.03.2015 - 16:15:30 loglevel<2> bulk_bot_recv: bot[10498]: bid: 0 size: 594863850 > bufsize: 64
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[10498]: bid: 0 st: 80
+29.03.2015 - 16:15:30 loglevel<3> bot_work: work bot[10498]: bid: 0 ip: 10.143.250.66 iplocal: 172.16.211.5 bot: 116 conf: 198 mf: 1 win: 1 flags: 0 smtp: 1 size: 32
+29.03.2015 - 16:15:30 loglevel<3> bot_work: new bid: 118877 bot[10498]
+29.03.2015 - 16:15:30 loglevel<3> cbck_write: write ok 24:24 bot[10498]: sd: 10 ip: 10.143.250.66
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read failed (total) 0:32 bot[10498]: sd: 10 ip: 10.143.250.66
+29.03.2015 - 16:15:30 loglevel<3> cbck_accept: accept bot[10499]: sd: 10 ip: 10.32.215.120
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read hdr ok 32:32 bot[10499]: sd: 10 ip: 10.32.215.120 size: 32
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read pkg ok 32:32 bot[10499]: sd: 10 ip: 10.32.215.120
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[10498]: bid: 5 st: 61
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[10499]: bid: 0 st: 60
+29.03.2015 - 16:15:30 loglevel<5> bulk_bot_recv: brh -> size = 32
+29.03.2015 - 16:15:30 loglevel<5> bulk_bot_recv: bulk_id: 1752330096 tmplver: 1798138981 cc_ver: 1769218144 size: 51081480
+52 51081480 543782318 64
+29.03.2015 - 16:15:30 loglevel<2> bulk_bot_recv: bot[10499]: bid: 0 size: 594863850 > bufsize: 64
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[10498]: bid: 5 st: 81
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[10499]: bid: 0 st: 80
+29.03.2015 - 16:15:30 loglevel<3> bot_work: work bot[10499]: bid: 0 ip: 10.32.215.120 iplocal: 172.16.211.5 bot: 116 conf: 198 mf: 1 win: 1 flags: 0 smtp: 1 size: 32
+29.03.2015 - 16:15:30 loglevel<3> bot_work: new bid: 118878 bot[10499]
+29.03.2015 - 16:15:30 loglevel<3> cbck_write: write ok 24:24 bot[10499]: sd: 10 ip: 10.32.215.120
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read failed (total) 0:32 bot[10499]: sd: 10 ip: 10.32.215.120
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[10499]: bid: 5 st: 61
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[10499]: bid: 5 st: 81
+29.03.2015 - 16:15:30 loglevel<3> cbck_accept: accept bot[0]: sd: 10 ip: 10.182.109.144
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read hdr ok 32:32 bot[0]: sd: 10 ip: 10.182.109.144 size: 32
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read pkg ok 32:32 bot[0]: sd: 10 ip: 10.182.109.144
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[0]: bid: 0 st: 60
+29.03.2015 - 16:15:30 loglevel<5> bulk_bot_recv: brh -> size = 32
+29.03.2015 - 16:15:30 loglevel<5> bulk_bot_recv: bulk_id: 1752330096 tmplver: 1798138981 cc_ver: 1769218144 size: 51081480
+52 51081480 543782318 64
+29.03.2015 - 16:15:30 loglevel<2> bulk_bot_recv: bot[0]: bid: 0 size: 594863850 > bufsize: 64
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[0]: bid: 0 st: 80
+29.03.2015 - 16:15:30 loglevel<3> bot_work: work bot[0]: bid: 0 ip: 10.182.109.144 iplocal: 172.16.211.5 bot: 116 conf: 198 mf: 1 win: 1 flags: 0 smtp: 1 size: 32
+29.03.2015 - 16:15:30 loglevel<3> bot_work: new bid: 118879 bot[0]
+29.03.2015 - 16:15:30 loglevel<3> cbck_write: write ok 24:24 bot[0]: sd: 10 ip: 10.182.109.144
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read failed (total) 0:32 bot[0]: sd: 10 ip: 10.182.109.144
+29.03.2015 - 16:15:30 loglevel<3> cbck_accept: accept bot[1]: sd: 10 ip: 10.243.18.49
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read hdr ok 32:32 bot[1]: sd: 10 ip: 10.243.18.49 size: 32
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read pkg ok 32:32 bot[1]: sd: 10 ip: 10.243.18.49
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[0]: bid: 5 st: 61
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[1]: bid: 0 st: 60
+29.03.2015 - 16:15:30 loglevel<5> bulk_bot_recv: brh -> size = 32
+29.03.2015 - 16:15:30 loglevel<5> bulk_bot_recv: bulk_id: 1752330096 tmplver: 1798138981 cc_ver: 1769218144 size: 51081480
+52 51081480 543782318 64
+29.03.2015 - 16:15:30 loglevel<2> bulk_bot_recv: bot[1]: bid: 0 size: 594863850 > bufsize: 64
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[0]: bid: 5 st: 81
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[1]: bid: 0 st: 80
+29.03.2015 - 16:15:30 loglevel<3> bot_work: work bot[1]: bid: 0 ip: 10.243.18.49 iplocal: 172.16.211.5 bot: 116 conf: 198 mf: 1 win: 1 flags: 0 smtp: 1 size: 32
+29.03.2015 - 16:15:30 loglevel<3> bot_work: new bid: 118880 bot[1]
+29.03.2015 - 16:15:30 loglevel<3> cbck_write: write ok 24:24 bot[1]: sd: 10 ip: 10.243.18.49
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read failed (total) 0:32 bot[1]: sd: 10 ip: 10.243.18.49
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[1]: bid: 5 st: 61
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[1]: bid: 5 st: 81
+29.03.2015 - 16:15:30 loglevel<3> cbck_accept: accept bot[2]: sd: 10 ip: 10.60.7.184
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read hdr ok 32:32 bot[2]: sd: 10 ip: 10.60.7.184 size: 32
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read pkg ok 32:32 bot[2]: sd: 10 ip: 10.60.7.184
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[2]: bid: 0 st: 60
+29.03.2015 - 16:15:30 loglevel<5> bulk_bot_recv: brh -> size = 32
+29.03.2015 - 16:15:30 loglevel<5> bulk_bot_recv: bulk_id: 1752330096 tmplver: 1798138981 cc_ver: 1769218144 size: 51081480
+52 51081480 543782318 64
+29.03.2015 - 16:15:30 loglevel<2> bulk_bot_recv: bot[2]: bid: 0 size: 594863850 > bufsize: 64
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[2]: bid: 0 st: 80
+29.03.2015 - 16:15:30 loglevel<3> bot_work: work bot[2]: bid: 0 ip: 10.60.7.184 iplocal: 172.16.211.5 bot: 116 conf: 198 mf: 1 win: 1 flags: 0 smtp: 1 size: 32
+29.03.2015 - 16:15:30 loglevel<3> bot_work: new bid: 118881 bot[2]
+29.03.2015 - 16:15:30 loglevel<3> cbck_write: write ok 24:24 bot[2]: sd: 10 ip: 10.60.7.184
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read failed (total) 0:32 bot[2]: sd: 10 ip: 10.60.7.184
+29.03.2015 - 16:15:30 loglevel<4> thread_bulk: get bot[2]: bid: 5 st: 61
+29.03.2015 - 16:15:30 loglevel<4> thread_bot: get bot[2]: bid: 5 st: 81
+29.03.2015 - 16:15:30 loglevel<3> cbck_accept: accept bot[3]: sd: 10 ip: 10.81.154.200
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read hdr ok 32:32 bot[3]: sd: 10 ip: 10.81.154.200 size: 32
+29.03.2015 - 16:15:30 loglevel<3> cbck_read: read pkg ok 32:32 bot[3]: sd: 10 ip: 10.81.154.200
+

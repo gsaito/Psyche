@@ -1,0 +1,117 @@
+(gdb) run
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /usr/local/psyche/bin/spcntrl 
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/i386-linux-gnu/libthread_db.so.1".
+[New Thread 0xb70e4b40 (LWP 3154)]
+[Thread 0xb70e4b40 (LWP 3154) exited]
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: just do it
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: addr = 172.16.211.134
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: port = 43242
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: nbots = 10500
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: nbotbuffer = 80000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: nbotmails = 1500
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: bulkmap = GS|BS|BS|BS|BS
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: ngibulkmails = 10000000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: nbigbulkmails = 200000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: ngibulkmxs = 1400000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: nbigbulkmxs = 100
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: support_host = mail.ru
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: support_ip = 194.67.57.26
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: statdelay = 60
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: versiondelay = 300
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: bulkdelay = 60
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: mfdelay = 10000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: blackdelay = 60
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: mflimit = 5000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: smtpavailable = 1
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: unluckymxcnt = 1000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: unluckymxprc = 99
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: knockdelay = 60
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: recvsendbottimeoutinterval = 300
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: big_split_size = 100000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: big_mx_percent = 0.000000e+00
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: big_mx_maximum = 0
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: big_permute_size = 50000000
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: mes_attach_path = /usr/local/psyche/data/mes_attach/
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: botver = 116
+17.02.2015 - 08:23:10 loglevel<5> common_config_server_load: mxmailslimit = 900000
+[New Thread 0xb70e4b40 (LWP 3155)]
+[New Thread 0xb66ffb40 (LWP 3156)]
+17.02.2015 - 08:23:10 loglevel<3> bulk_init : bulk[0] base_type[21] spam_engine[0]
+[New Thread 0xb58ffb40 (LWP 3157)]
+[New Thread 0xa85ffb40 (LWP 3158)]
+17.02.2015 - 08:23:10 loglevel<3> bulk_init : bulk[1] base_type[22] spam_engine[0]
+17.02.2015 - 08:23:10 loglevel<3> bulk_init : bulk[2] base_type[22] spam_engine[0]
+17.02.2015 - 08:23:10 loglevel<3> bulk_init : bulk[3] base_type[22] spam_engine[0]
+17.02.2015 - 08:23:10 loglevel<3> bulk_init : bulk[4] base_type[22] spam_engine[0]
+17.02.2015 - 08:23:10 loglevel<3> bulk_database: bulk[0]: id_bulk: 0 bstate: 30 database
+17.02.2015 - 08:23:10 loglevel<3> bulk_database: bulk[1]: id_bulk: 0 bstate: 30 database
+17.02.2015 - 08:23:10 loglevel<3> bulk_database: bulk[2]: id_bulk: 0 bstate: 30 database
+17.02.2015 - 08:23:10 loglevel<3> bulk_database: bulk[3]: id_bulk: 0 bstate: 30 database
+17.02.2015 - 08:23:10 loglevel<3> bulk_database: bulk[4]: id_bulk: 0 bstate: 30 database
+17.02.2015 - 08:23:10 loglevel<4> thread_bot: nameservertimer: 1424190190
+17.02.2015 - 08:23:10 loglevel<3> get_update: ver: 116
+17.02.2015 - 08:23:10 loglevel<3> get_update: done size: 8
+17.02.2015 - 08:23:10 loglevel<3> get_config: ver: 198
+17.02.2015 - 08:23:10 loglevel<3> get_config: done size: 416
+17.02.2015 - 08:23:10 loglevel<3> get_dictionary: ver: -
+17.02.2015 - 08:23:10 loglevel<3> get_dictionary: size: 71377
+17.02.2015 - 08:23:10 loglevel<3> get_mailfrom: ver: 1
+17.02.2015 - 08:23:10 loglevel<3> get_mailfrom: done size: 358511
+17.02.2015 - 08:23:10 loglevel<3> get_black: count: 0
+17.02.2015 - 08:23:15 loglevel<3> cbck_accept: accept bot[0]: sd: 10 ip: 172.16.211.1
+17.02.2015 - 08:23:15 loglevel<3> cbck_read: read hdr ok 32:32 bot[0]: sd: 10 ip: 172.16.211.1 size: 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bulk: get bot[0]: bid: 30609580 st: 60
+17.02.2015 - 08:23:15 loglevel<5> bulk_bot_recv: brh -> size = 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bot: get bot[0]: bid: 30609580 st: 80
+17.02.2015 - 08:23:15 loglevel<3> bot_work: work bot[0]: bid: 30609580 ip: 172.16.211.1 iplocal: 1.0.0.0 bot: 0 conf: 0 mf: 333381436 win: 32743 flags: 0 smtp: 0 size: 0
+17.02.2015 - 08:23:15 loglevel<3> bot_work: bot update ver: 116 bot[0] bid: 30609580
+17.02.2015 - 08:23:15 loglevel<3> cbck_write: write ok 8:8 bot[0]: sd: 10 ip: 172.16.211.1
+17.02.2015 - 08:23:15 loglevel<3> cbck_read: read hdr ok 32:32 bot[0]: sd: 10 ip: 172.16.211.1 size: 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bulk: get bot[0]: bid: 0 st: 60
+17.02.2015 - 08:23:15 loglevel<5> bulk_bot_recv: brh -> size = 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bot: get bot[0]: bid: 0 st: 80
+17.02.2015 - 08:23:15 loglevel<3> bot_work: work bot[0]: bid: 0 ip: 172.16.211.1 iplocal: 0.0.0.0 bot: 3 conf: 0 mf: 0 win: 0 flags: 0 smtp: 0 size: 0
+17.02.2015 - 08:23:15 loglevel<3> bot_work: bot update ver: 116 bot[0] bid: 0
+17.02.2015 - 08:23:15 loglevel<3> cbck_write: write ok 8:8 bot[0]: sd: 10 ip: 172.16.211.1
+17.02.2015 - 08:23:15 loglevel<3> cbck_read: read hdr ok 32:32 bot[0]: sd: 10 ip: 172.16.211.1 size: 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bulk: get bot[0]: bid: 0 st: 60
+17.02.2015 - 08:23:15 loglevel<5> bulk_bot_recv: brh -> size = 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bot: get bot[0]: bid: 0 st: 80
+17.02.2015 - 08:23:15 loglevel<3> bot_work: work bot[0]: bid: 0 ip: 172.16.211.1 iplocal: 0.0.0.0 bot: 0 conf: 0 mf: 0 win: 0 flags: 0 smtp: 0 size: 0
+17.02.2015 - 08:23:15 loglevel<3> bot_work: bot update ver: 116 bot[0] bid: 0
+17.02.2015 - 08:23:15 loglevel<3> cbck_write: write ok 8:8 bot[0]: sd: 10 ip: 172.16.211.1
+17.02.2015 - 08:23:15 loglevel<3> cbck_read: read hdr ok 32:32 bot[0]: sd: 10 ip: 172.16.211.1 size: 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bulk: get bot[0]: bid: 0 st: 60
+17.02.2015 - 08:23:15 loglevel<5> bulk_bot_recv: brh -> size = 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bot: get bot[0]: bid: 0 st: 80
+17.02.2015 - 08:23:15 loglevel<3> bot_work: work bot[0]: bid: 0 ip: 172.16.211.1 iplocal: 0.0.0.0 bot: 0 conf: 0 mf: 0 win: 0 flags: 0 smtp: 0 size: 0
+17.02.2015 - 08:23:15 loglevel<3> bot_work: bot update ver: 116 bot[0] bid: 0
+17.02.2015 - 08:23:15 loglevel<3> cbck_write: write ok 8:8 bot[0]: sd: 10 ip: 172.16.211.1
+17.02.2015 - 08:23:15 loglevel<3> cbck_read: read hdr ok 32:32 bot[0]: sd: 10 ip: 172.16.211.1 size: 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bulk: get bot[0]: bid: 0 st: 60
+17.02.2015 - 08:23:15 loglevel<5> bulk_bot_recv: brh -> size = 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bot: get bot[0]: bid: 0 st: 80
+17.02.2015 - 08:23:15 loglevel<3> bot_work: work bot[0]: bid: 0 ip: 172.16.211.1 iplocal: 0.0.0.0 bot: 0 conf: 0 mf: 0 win: 0 flags: 0 smtp: 0 size: 0
+17.02.2015 - 08:23:15 loglevel<3> bot_work: bot update ver: 116 bot[0] bid: 0
+17.02.2015 - 08:23:15 loglevel<3> cbck_write: write ok 8:8 bot[0]: sd: 10 ip: 172.16.211.1
+17.02.2015 - 08:23:15 loglevel<3> cbck_read: read hdr ok 32:32 bot[0]: sd: 10 ip: 172.16.211.1 size: 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bulk: get bot[0]: bid: 0 st: 60
+17.02.2015 - 08:23:15 loglevel<5> bulk_bot_recv: brh -> size = 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bot: get bot[0]: bid: 0 st: 80
+17.02.2015 - 08:23:15 loglevel<3> bot_work: work bot[0]: bid: 0 ip: 172.16.211.1 iplocal: 0.0.0.0 bot: 0 conf: 0 mf: 0 win: 0 flags: 0 smtp: 0 size: 0
+17.02.2015 - 08:23:15 loglevel<3> bot_work: bot update ver: 116 bot[0] bid: 0
+17.02.2015 - 08:23:15 loglevel<3> cbck_write: write ok 8:8 bot[0]: sd: 10 ip: 172.16.211.1
+17.02.2015 - 08:23:15 loglevel<3> cbck_read: read hdr ok 32:32 bot[0]: sd: 10 ip: 172.16.211.1 size: 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bulk: get bot[0]: bid: 0 st: 60
+17.02.2015 - 08:23:15 loglevel<5> bulk_bot_recv: brh -> size = 0
+17.02.2015 - 08:23:15 loglevel<4> thread_bot: get bot[0]: bid: 0 st: 80
+17.02.2015 - 08:23:15 loglevel<3> bot_work: work bot[0]: bid: 0 ip: 172.16.211.1 iplocal: 0.0.0.0 bot: 0 conf: 0 mf: 0 win: 0 flags: 0 smtp: 0 size: 0
+17.02.2015 - 08:23:15 loglevel<3> bot_work: bot update ver: 116 bot[0] bid: 0
+17.02.2015 - 08:23:15 loglevel<3> cbck_write: write ok 8:8 bot[0]: sd: 10 ip: 172.16.211.1
+17.02.2015 - 08:23:25 loglevel<3> get_black: count: 0
+17.02.2015 - 08:23:40 loglevel<3> get_black: count: 0
+

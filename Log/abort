@@ -1,0 +1,26 @@
+(gdb) run
+
+The program being debugged has been started already.
+Start it from the beginning? (y or n) y
+
+Starting program: /usr/local/psyche/bin/spcntrl 
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib/i386-linux-gnu/libthread_db.so.1".
+[New Thread 0xb70e4b40 (LWP 21557)]
+[Thread 0xb70e4b40 (LWP 21557) exited]
+[New Thread 0xb70e4b40 (LWP 21558)]
+[New Thread 0xb66ffb40 (LWP 21559)]
+[New Thread 0xb5affb40 (LWP 21560)]
+[New Thread 0xb42a7b40 (LWP 21561)]
+
+52 51081472 543782248 32617
+16.02.2015 - 10:34:44 loglevel<2> bulk_bot_recv: bot[0]: bid: 0 size: 594863772 > bufsize: 32617
+16.02.2015 - 10:34:44 loglevel<2> cbck_read: IMPLEMENT bufskip
+*** Error in `/usr/local/psyche/bin/spcntrl': double free or corruption (out): 0x080bb730 ***
+
+Program received signal SIGABRT, Aborted.
+[Switching to Thread 0xb70e4b40 (LWP 21558)]
+0xb7fdd424 in __kernel_vsyscall ()
+
+(gdb) 
+

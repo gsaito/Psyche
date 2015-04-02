@@ -29,11 +29,11 @@ class BOT_RHEADER(Structure):
 
 class BOTBULK_INFO(Structure):
 	_fields_ = [
-		#("mails",		POINTER(c_int)),
+		("mails",		POINTER(c_int)),
 		("bulk_id",		c_int),
-		("count",		c_int),
 		("tmplver",		c_int),
 		("cc_ver",		c_int),
+		("count",		c_int),
 		("accounts",		c_void_p), # TODO unsigned *accounts
 		("accounts_send",	c_void_p), # TODO unsigned *accounts_send
 		]
