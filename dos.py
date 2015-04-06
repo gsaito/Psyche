@@ -126,7 +126,7 @@ def main():
             # Initialize socket
             s = init_socket(iface)
 
-            # Send data (BOT_RHEADER packed binary) TODO: bot_info
+            # Send data (BOT_RHEADER packed binary)
             data = buffer(bot_rheader)[:] * 2
             s.sendall(data)
 

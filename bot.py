@@ -56,110 +56,55 @@ def main():
     cprint("\n[*] Sending data to " + HOST + " : " + str(PORT) \
             + " (hexdump below)\n", "green")
 
-    # Initialise bot_info, bot_rheader, botbulk_info structures
-    bot_info = BOT_INFO()
+    # Initialise bot_rheader, botbulk_info, and bulk_info structures
     bot_rheader = BOT_RHEADER()
     botbulk_info = BOTBULK_INFO()
+    bulk_info = BULK_INFO()
 
     # Populate bot_rheader structure
-    bot_rheader.bid     = 71378
-    bot_rheader.iplocal = 97718444 # Should be INT
-    bot_rheader.botver  = 116
-    bot_rheader.confver = 198
-    bot_rheader.mfver   = 1
-    bot_rheader.winver  = 1
-    bot_rheader.flags   = 0
-    bot_rheader.smtp    = 1
-    bot_rheader.size    = 32
-
-    # Conversion: Structure -> Bytes (Str)
-    #bot_info.bufrecv = buffer(bot_rheader)[:] # Same as pack()
-
-    # Populate bot_info structure
-    bot_info.ip                 = "\254\020\323\003" # char[4]
-    bot_info.have_ip            = 1
-    bot_info.bufsize            = 32
-    bot_info.bid                = 0
-    bot_info.timer              = 1425851228
-    bot_info.state              = 80 # BSTBULKOK
-    bot_info.bshcommand         = RC_UPDATE
-    bot_info.sd                 = 10
-    bot_info.bufsmall           = 0
-    
-    bot_info.bsent              = 1
-
-    bot_info.blackliststatus    = 0
-
-    """
-    bot_info.bufsend            = ""
-    bot_info.bufrecv            = ""
-    bot_info.bufdata            = ""
-
-    bot_info.id                 = 0
-
-    bot_info.flags              = 0
-
-    bot_info.botbulk            = pointer(botbulk_info)
-    """
-
-    # Statistics
-    bot_info.bnouser            = 0
-    bot_info.bunlucky           = 0
-    bot_info.bunksmtpansw       = 0
-    bot_info.bblacklisted       = 1
-    bot_info.bmailfrombad       = 0
-    bot_info.bgraylisted        = 1
-    bot_info.bnomx              = 0
-    bot_info.bnomxip            = 0
-    bot_info.bnoaliveip         = 0
-    bot_info.bsmtptimeout       = 0
-    bot_info.bconnect           = 0
-    bot_info.brecv              = 0
-    bot_info.bbotmailtimeout    = 0
-    bot_info.bspammessage       = 0
-    bot_info.bnohostname        = 0
-    bot_info.blckmx             = 0
-
-    bot_info.captcha_good       = 0
-    bot_info.captcha_total      = 0
-
-    """
-    refbulk = (c_byte * 4)()
-    bot_info.refbulk            = cast(refbulk, POINTER(c_int)) # NULL
-    bot_info.refbulk_size       = 0
-    """
+    bot_rheader.bid             = 71378
+    bot_rheader.iplocal         = 97718444 # Should be INT
+    bot_rheader.botver          = 116
+    bot_rheader.confver         = 198
+    bot_rheader.mfver           = 1
+    bot_rheader.winver          = 1
+    bot_rheader.flags           = 129 # ERZ: 8, R5+HOSTNAME: 129, DEFAULT: 0
+    bot_rheader.smtp            = 1
+    bot_rheader.size            = len(buffer(botbulk_info)[:])
 
     # Populate botbulk_info structure
-    botbulk_info.bulk_id        = 1069124889
-    botbulk_info.tmplver        = 3
-    botbulk_info.cc_ver         = 3
-    botbulk_info.count          = 1
+    botbulk_info.bulk_id        = 1
+    botbulk_info.tmplver        = 1
+    botbulk_info.cc_ver         = 198
+    botbulk_info.logsize        = 1
+    botbulk_info.addrsize       = 0
     """
+    botbulk_info.count          = 1
     botbulk_info.mails          = ""
     botbulk_info.accounts       = ""
     botbulk_info.accounts_send  = ""
     """
 
-    # Send data (BOT_RHEADER followed by BOT_INFO)
+    # Populate bulk_info structure
+    bulk_info.id                = 0
+    bulk_info.state             = 5 # SENT: 1, BLACKLISTED: 5
+
+    # Send data
+    cprint("BOT_RHEADER\n", "yellow")
+    print hexdump(buffer(bot_rheader)[:])
     cprint("BOTBULK_INFO\n", "yellow")
     print hexdump(buffer(botbulk_info)[:])
-    cprint("\nBOT_INFO\n", "yellow")
-    print hexdump(buffer(bot_info)[:])
-    cprint("\nDATA\n", "yellow")
+    cprint("BULK_INFO\n", "yellow")
+    print hexdump(buffer(bulk_info)[:])
+    cprint("DATA\n", "yellow")
     data = buffer(bot_rheader)[:] \
-            + pencrypt(buffer(botbulk_info)[:], len(buffer(botbulk_info)[:])) 
-            #+ pencrypt(chr(255) * 233, 233)
-            #+ pencrypt(buffer(bot_info)[:], len(buffer(bot_info)[:]))
-
+            + pencrypt(buffer(botbulk_info)[:], len(buffer(botbulk_info)[:]))
     print hexdump(data)
     s.sendall(data)
     cprint("[+] Sent! Now waiting to receive data...\n", "green")
 
     # Initialise recv buffer
     buf = ""
-
-    # Flags
-    skip = False
 
     # Start timer
     start = time.clock()
@@ -177,10 +122,12 @@ def main():
 	
             # Got some data!
             end = time.clock()
-            sys.stdout.write("[+] Received (" + str(end - start) + "s): ")
 
-            # Interpret command
+            # Interpret RC command (1-9)
             cmd = ord(rcvmsg[0])
+
+            if cmd in range(1,10):
+                sys.stdout.write("[+] Received (" + str(end - start) + "s): ")
 
             if   cmd == RC_SLEEP:
                 cprint("RC_SLEEP",      "cyan")
@@ -201,7 +148,7 @@ def main():
             elif cmd == RC_ACCOUNTS:
                 cprint("RC_ACCOUNTS",   "cyan")
 
-	    print hexdump(rcvmsg)
+	    #print hexdump(rcvmsg)
 
             # Command actions
             if cmd == RC_BID:
@@ -218,19 +165,8 @@ def main():
                 cprint("[+] Assigned BID: " + str(bid[0]) \
                         + ", Timer: " + str(timer[0]) + "\n", "green")
 
-                # Update BOT_RHEADER and BOT_INFO structures
+                # Update BOT_RHEADER structure
                 bot_rheader.bid = bid[0]
-                bot_info.bid = bid[0]
-                bot_info.timer = timer[0]
-
-            """
-            if cmd == RC_UPDATE and not skip:
-                cprint("[*] Sending updated data...", "yellow")
-                data = buffer(bot_rheader)[:] + buffer(bot_info)[:]
-                print hexdump(data)
-                s.sendall(data)
-                skip = True
-            """
 
             # Store data in buffer (for later use)
             buf += rcvmsg
@@ -238,15 +174,27 @@ def main():
         except socket.timeout:
 
             # Timed out on receiving data: 
+
             # Let's check out the contents of recv buffer (if not empty)
             if buf:
+                # Send back statistics
+                cprint("\n[*] Sending back statistics...", "green")
+                bot_rheader.size = len(buffer(botbulk_info)[:]) \
+                                    + len(buffer(bulk_info)[:])
+                data = buffer(bot_rheader)[:] \
+                    + pencrypt(buffer(botbulk_info)[:], len(buffer(botbulk_info)[:])) \
+                    + pencrypt(buffer(bulk_info)[:], len(buffer(bulk_info)[:])) 
+                cprint("\nDATA\n", "yellow")
+                print hexdump(data)
+                s.sendall(data)
+
                 # Decrypt recv buffer
                 #dec = pdecrypt(buf, len(buf))
                 #print "[+] Decrypted:\n", dec, "\n"
 
                 # Clear recv buffer
                 buf = ""
-                cprint("[*] Listening for incoming data (press Ctrl+C to quit)\n" \
+                cprint("\n[*] Listening for incoming data (press Ctrl+C to quit)\n" \
                         , "green")
 
     # Close socket

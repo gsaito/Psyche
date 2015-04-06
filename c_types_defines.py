@@ -31,11 +31,19 @@ class BOTBULK_INFO(Structure):
 	_fields_ = [
 		#("mails",		POINTER(c_int)),
 		("bulk_id",		c_int),
-		("count",		c_int),
 		("tmplver",		c_int),
 		("cc_ver",		c_int),
-		("accounts",		c_void_p), # TODO unsigned *accounts
-		("accounts_send",	c_void_p), # TODO unsigned *accounts_send
+		("logsize",		c_int),
+		("addrsize",		c_int),
+		#("count",		c_int),
+		#("accounts",		c_void_p), 
+		#("accounts_send",	c_void_p), 
+		]
+
+class BULK_INFO(Structure):
+	_fields_ = [
+		("id",		        c_int),
+		("state",		c_int),
 		]
 
 class BOT_INFO(Structure):
