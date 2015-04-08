@@ -63,7 +63,7 @@ def init_socket(iface):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((get_ip_address(iface), 0))
-    s.settimeout(3.0) # Set 3s timeout
+    #s.settimeout(3.0) # Set 3s timeout
 
     # Connect
     s.connect((HOST, PORT))
@@ -159,9 +159,12 @@ def main():
         for i in range(0, count+1):
             call(["ifconfig", IFACE + ":" + str(i), "down"])
 
+        # Print statistics
+        cprint("[*] Statistics:", "yellow")
         cprint("Run time: " + str(run_time), "yellow")
-        cprint("Bot registered: " + str(count), "yellow")
-        cprint("Bot registered per second: " + str(count/run_time), "yellow")
+        cprint("Number of bots registered: " + str(count), "yellow")
+        cprint("Average register speed (bot per second): " + str(count/run_time), "yellow")
+        cprint("Average time taken to register one bot (s): " + str(run_time/count), "yellow")
 
 
 if __name__ == "__main__":
