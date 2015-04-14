@@ -43,6 +43,67 @@ RC_CONFIG   = 7
 RC_MAILFROM = 8
 RC_ACCOUNTS = 9
 
+# Initialise bot_rheader, botbulk_info, and bulk_info structures
+bot_rheader = BOT_RHEADER()
+botbulk_info = BOTBULK_INFO()
+bulk_info = BULK_INFO()
+
+# Flags
+RC_SLEEP_OK = False
+
+def process_package(rcvmsg, rtt):
+    # Interpret RC command (1-9)
+    cmd = ord(rcvmsg[0])
+
+    if cmd in range(1,10):
+        sys.stdout.write("[+] Received (RTT: " + str(rtt * 1000) \
+                + "ms, Pkg size: " + str(len(rcvmsg)) + "): ")
+
+    if   cmd == RC_SLEEP:
+        cprint("RC_SLEEP",      "cyan")
+        RC_SLEEP_OK = True
+    elif cmd == RC_GETWORK:
+        cprint("RC_GETWORK",    "cyan")
+    elif cmd == RC_RESTART:
+        cprint("RC_RESTART",    "cyan")
+    elif cmd == RC_UPDATE:
+        cprint("RC_UPDATE",     "cyan")
+    elif cmd == RC_BID:
+        cprint("RC_BID",        "cyan")
+    elif cmd == RC_TEMPLATE:
+        cprint("RC_TEMPLATE",   "cyan")
+    elif cmd == RC_CONFIG:
+        cprint("RC_CONFIG",     "cyan")
+    elif cmd == RC_MAILFROM:
+        cprint("RC_MAILFROM",   "cyan")
+    elif cmd == RC_ACCOUNTS:
+        cprint("RC_ACCOUNTS",   "cyan")
+
+    # Decrypt data received
+    if len(rcvmsg) > 8:
+        dec = pdecrypt(rcvmsg[8:], len(rcvmsg[8:]))
+        cprint("Decryption:\n" + hexdump(dec), "yellow")
+
+    # Command actions
+    if cmd == RC_BID:
+        # Extract the BID from the decrypted data
+        bid = struct.unpack("i", dec[0:4]) # Returns a tuple
+
+        # Extract sign.timer from the decrypted data
+        timer = struct.unpack("i", dec[8:12])
+
+        cprint("[+] Assigned BID: " + str(bid[0]) \
+                + ", Timer: " + str(timer[0]) + "\n", "green")
+
+        # Update BOT_RHEADER structure
+        bot_rheader.bid = bid[0]
+
+def bulk_info_factory(id, state):
+    bi = BULK_INFO()
+    bi.id = id
+    bi.state = state
+    return buffer(bi)[:]
+
 def main():
     # Socket configurations
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,22 +114,18 @@ def main():
     # Connect
     s.connect((HOST, PORT))
 
+    print "Cutwail Bot Clone v5.1"
     cprint("\n[*] Sending data to " + HOST + " : " + str(PORT) \
             + " (hexdump below)\n", "green")
 
-    # Initialise bot_rheader, botbulk_info, and bulk_info structures
-    bot_rheader = BOT_RHEADER()
-    botbulk_info = BOTBULK_INFO()
-    bulk_info = BULK_INFO()
-
     # Populate bot_rheader structure
-    bot_rheader.bid             = 71378
+    bot_rheader.bid             = 32534
     bot_rheader.iplocal         = 97718444 # Should be INT
     bot_rheader.botver          = 116
     bot_rheader.confver         = 198
     bot_rheader.mfver           = 1
-    bot_rheader.winver          = 1
-    bot_rheader.flags           = 129 # ERZ: 8, R5+HOSTNAME: 129, DEFAULT: 0
+    bot_rheader.winver          = 5
+    bot_rheader.flags           = 1 # ERZ: 8, R5+HOSTNAME: 129, DEFAULT: 0
     bot_rheader.smtp            = 1
     bot_rheader.size            = len(buffer(botbulk_info)[:])
 
@@ -76,30 +133,24 @@ def main():
     botbulk_info.bulk_id        = 1
     botbulk_info.tmplver        = 1
     botbulk_info.cc_ver         = 198
-    botbulk_info.logsize        = 1
+    botbulk_info.logsize        = 0
     botbulk_info.addrsize       = 0
-    """
-    botbulk_info.count          = 1
-    botbulk_info.mails          = ""
-    botbulk_info.accounts       = ""
-    botbulk_info.accounts_send  = ""
-    """
 
     # Populate bulk_info structure
     bulk_info.id                = 0
     bulk_info.state             = 5 # SENT: 1, BLACKLISTED: 5
 
-    # Send data
-    cprint("BOT_RHEADER\n", "yellow")
-    print hexdump(buffer(bot_rheader)[:])
-    cprint("BOTBULK_INFO\n", "yellow")
-    print hexdump(buffer(botbulk_info)[:])
-    cprint("BULK_INFO\n", "yellow")
-    print hexdump(buffer(bulk_info)[:])
-    cprint("DATA\n", "yellow")
+    # Construct data package
     data = buffer(bot_rheader)[:] \
             + pencrypt(buffer(botbulk_info)[:], len(buffer(botbulk_info)[:]))
-    print hexdump(data)
+
+    # Print package content
+    cprint("BOT_RHEADER\n", "yellow"); print hexdump(buffer(bot_rheader)[:])
+    cprint("BOTBULK_INFO\n", "yellow"); print hexdump(buffer(botbulk_info)[:])
+    cprint("BULK_INFO\n", "yellow"); print hexdump(buffer(bulk_info)[:])
+    cprint("DATA\n", "yellow"); print hexdump(data)
+    
+    # Send data package
     s.sendall(data)
     cprint("[+] Sent! Now waiting to receive data...\n", "green")
 
@@ -114,87 +165,61 @@ def main():
 
         try:
             # Try receiving data
-            rcvmsg = s.recv(1024)
+            rcvmsg = s.recv(4096)
 
             # Check whether connection is closed
 	    if rcvmsg == "":
 	        break
 	
-            # Got some data!
-            end = time.clock()
-
-            # Interpret RC command (1-9)
-            cmd = ord(rcvmsg[0])
-
-            if cmd in range(1,10):
-                sys.stdout.write("[+] Received (" + str(end - start) + "s): ")
-
-            if   cmd == RC_SLEEP:
-                cprint("RC_SLEEP",      "cyan")
-            elif cmd == RC_GETWORK:
-                cprint("RC_GETWORK",    "cyan")
-            elif cmd == RC_RESTART:
-                cprint("RC_RESTART",    "cyan")
-            elif cmd == RC_UPDATE:
-                cprint("RC_UPDATE",     "cyan")
-            elif cmd == RC_BID:
-                cprint("RC_BID",        "cyan")
-            elif cmd == RC_TEMPLATE:
-                cprint("RC_TEMPLATE",   "cyan")
-            elif cmd == RC_CONFIG:
-                cprint("RC_CONFIG",     "cyan")
-            elif cmd == RC_MAILFROM:
-                cprint("RC_MAILFROM",   "cyan")
-            elif cmd == RC_ACCOUNTS:
-                cprint("RC_ACCOUNTS",   "cyan")
-
-	    #print hexdump(rcvmsg)
-
-            # Command actions
-            if cmd == RC_BID:
-                # Decrypt data received
-                dec = pdecrypt(rcvmsg[8:], len(rcvmsg[8:]))
-                cprint("Decryption:\n" + hexdump(dec), "yellow")
-
-                # Extract the BID from the decrypted data
-                bid = struct.unpack("i", dec[0:4]) # Returns a tuple
-
-                # Extract sign.timer from the decrypted data
-                timer = struct.unpack("i", dec[8:12])
-
-                cprint("[+] Assigned BID: " + str(bid[0]) \
-                        + ", Timer: " + str(timer[0]) + "\n", "green")
-
-                # Update BOT_RHEADER structure
-                bot_rheader.bid = bid[0]
-
-            # Store data in buffer (for later use)
+            # Got some data! Store data in buffer (for later use)
             buf += rcvmsg
         
         except socket.timeout:
 
             # Timed out on receiving data: 
+            end = time.clock()  # Stop timer
+            rtt = end - start   # Compute RTT
 
             # Let's check out the contents of recv buffer (if not empty)
             if buf:
-                # Send back statistics
-                cprint("\n[*] Sending back statistics...", "green")
-                bot_rheader.size = len(buffer(botbulk_info)[:]) \
-                                    + len(buffer(bulk_info)[:])
-                data = buffer(bot_rheader)[:] \
-                    + pencrypt(buffer(botbulk_info)[:], len(buffer(botbulk_info)[:])) \
-                    + pencrypt(buffer(bulk_info)[:], len(buffer(bulk_info)[:])) 
-                cprint("\nDATA\n", "yellow")
-                print hexdump(data)
-                s.sendall(data)
+                # Process package
+                process_package(buf, rtt)
 
-                # Decrypt recv buffer
-                #dec = pdecrypt(buf, len(buf))
-                #print "[+] Decrypted:\n", dec, "\n"
+                # Send back statistics:
+                cprint("\n[*] Send back data package...\t" \
+                            + "(press ENTER to continue) ", "green", end=""); 
+
+                raw_input("")
+                
+                """
+                cprint("\n[*] Ready to send data package... ", "green"); 
+                state = int(raw_input("Enter state > "))
+                if state not in range(1, 10):
+                    state = 1
+                """
+                
+                # Create a BULK_INFO array
+                bulk_info_array = ""
+                for i in range(0, 2):
+                    bulk_info_array += bulk_info_factory(i, 5)
+
+                # Ajust the size fields of botbulk_info and bot_rheader accordingly
+                botbulk_info.logsize = i + 1
+                bot_rheader.size = len(buffer(botbulk_info)[:]) \
+                                    + len(buffer(bulk_info)[:]) * botbulk_info.logsize
+
+                # Construct data package
+                data = buffer(bot_rheader)[:] \
+                        + pencrypt(buffer(botbulk_info)[:] \
+                                + bulk_info_array, bot_rheader.size)
+
+                cprint("\nDATA\n", "yellow"); print hexdump(data)
+                start = time.clock() # Restart timer
+                s.sendall(data)
 
                 # Clear recv buffer
                 buf = ""
-                cprint("\n[*] Listening for incoming data (press Ctrl+C to quit)\n" \
+                cprint("\n[*] Listening for incoming data...\t(press Ctrl+C to quit)\n" \
                         , "green")
 
     # Close socket
