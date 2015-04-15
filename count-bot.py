@@ -20,127 +20,112 @@ import fcntl
 import struct
 import time
 
+from bot import init_socket
 from cipher import pencrypt, pdecrypt
 from utils import hexdump, get_ip_address
 from c_types_defines import *
 from termcolor import cprint
+from progressbar import ProgressBar
 
 # C&C connection IP and Port number
-# Test: nc -l 8080 | hexdump -C
-#HOST = "127.0.0.1"
-HOST = "172.16.211.134"
+HOST = "10.0.0.128"
 PORT = 43242
+
+# Network interface of bot
+IFACE   = "vmnet8"
+TIMEOUT = 3
 
 # C&C commands
 RC_BID      = 5
 
-# Initialise bot_rheader structure
-bot_rheader = BOT_RHEADER()
-
-def init_bot_rheader():
-    # Populate bot_rheader structure
-    bot_rheader.bid     = 0
-    bot_rheader.iplocal = 97718444 # Should be INT
-    bot_rheader.botver  = 116
-    bot_rheader.confver = 198
-    bot_rheader.mfver   = 1
-    bot_rheader.winver  = 1
-    bot_rheader.flags   = 0
-    bot_rheader.smtp    = 1
-    bot_rheader.size    = 32
-
-def init_socket():
-    # Socket configurations
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((get_ip_address("vmnet8"), 0))
-    s.settimeout(3.0) # Set 3s timeout
-
-    # Connect
-    s.connect((HOST, PORT))
-
-    return s
-
+# This function listens for the RC_BID command specifically.
+# It is possible to use the process_package() from the bot module instead, but
+# the function below is more efficient for this program.
 def get_bid(s):
     while True:
-        # Try receiving data
-        rcvmsg = s.recv(1024)
+        try:
+            # Try receiving data
+            rcvmsg = s.recv(1024)
 
-        # Check whether connection is closed
-	if rcvmsg == "":
-            break
+            # Check whether connection is closed
+	    if rcvmsg == "":
+                break
 	
-        # Got some data!
+            # Got server response:
+            cmd = struct.unpack("i", rcvmsg[0:4])[0] 
 
-        # Interpret command
-        cmd = ord(rcvmsg[0])
+            if cmd == RC_BID:
+                # Decrypt data received
+                dec = pdecrypt(rcvmsg[8:], len(rcvmsg[8:]))
 
-        if cmd == RC_BID:
-            # Decrypt data received
-            dec = pdecrypt(rcvmsg[8:], len(rcvmsg[8:]))
+                # Extract the BID from the decrypted data
+                bid = struct.unpack("i", dec[0:4])[0] 
+                return bid
 
-            # Extract the BID from the decrypted data
-            bid = struct.unpack("i", dec[0:4]) # Returns a tuple
-            break
-
-    # Close socket
-    s.close()
-
-    return bid[0]
+        except socket.error as e:
+            print "[-]", str(e)
 
 def main():
+    print "Bot counter v2.2\n"
+
     # Initialize bot_rheader structure
-    init_bot_rheader()
+    bot_rheader = init_bot_rheader(bid=0, size=0)
 
     # Initialize socket
-    s = init_socket()
+    s = init_socket(IFACE, TIMEOUT)
 
-    # Send data (BOT_RHEADER packed binary) TODO: bot_info
-    data = buffer(bot_rheader)[:] * 2
-    s.sendall(data)
+    # Send data (BOT_RHEADER packed binary)
+    s.sendall(buffer(bot_rheader)[:])
 
     # Get BID upper bound
     upper_bound = get_bid(s)
 
     if not upper_bound:
         cprint("[-] Error: Failed to get BID upper bound", "red")
-        exit(-1)
+        sys.exit(-1)
     else:
         cprint("[+] Got BID upper bound: " + str(upper_bound), "green")
 
     # Give the user chance to see the upper bound
     time.sleep(3)
 
-    # Bot entry count
-    bot_count = 0
+    cprint("\n[*] Starting bot counter...", "cyan")
 
-    # BID of bots registered
-    bid_registered = []
+    bot_count = 0           # Bot entry count
+    bid_registered = []     # BID of bots registered
+    bid_not_registered = [] # BID of bots not registered
 
-    # BID of bots not registered
-    bid_not_registered = []
+    # Show progress bar
+    pbar = ProgressBar()
 
     # Search And Destroy
-    for bid in range(upper_bound - 1, 0, -1):
+    for bid in pbar(list(range(upper_bound - 1, 0, -1))):
         # Spoof BID
         bot_rheader.bid = bid
 
-        # Re-initiate socket connection
-        s = init_socket()
-
-        # Send data TODO: bot_info
-        data = buffer(bot_rheader)[:] * 2
-        s.sendall(data)
+        s = init_socket(IFACE, TIMEOUT) # Re-initiate socket connection
+        s.sendall(buffer(bot_rheader)[:]) # Send data
 
         # Check return BID
         if bid == get_bid(s):
             bot_count += 1
             bid_registered.append(bid) 
-            cprint("[BID: " + str(bid) + "]" + " Bot found\t\tTotal: " \
-                    + str(bot_count), "cyan")
+            #cprint("[BID: " + str(bid) + "]" + " Bot found\t\tTotal: " \
+            #       + str(bot_count), "cyan")
         else:
             bid_not_registered.append(bid)
-            cprint("[BID: " + str(bid) + "]" + " Bot not registered", "red")
+            #cprint("[BID: " + str(bid) + "]" + " Bot not registered", "red")
+
+    # Print statistics
+    cprint("\n[+] Statistics:", "yellow")
+    cprint("Total bot count: " + str(bot_count), "yellow")
+    cprint("\nBID registered:", "yellow")
+    print "[%s]" % ", ".join(map(str, bid_registered))
+    cprint("\nBID not registered:", "yellow")
+    print "[%s]" % ", ".join(map(str, bid_not_registered))
+
+    # Close socket
+    s.close()
 
 if __name__ == "__main__":
     main()

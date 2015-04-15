@@ -7,10 +7,12 @@ This program implements the following ctype structures:
 
     BOT_RHEADER     : from globals.h:24
     BOTBULK_INFO    : from spcntrl.h:111
+    BULK_INFO       : from spcntrl.h:255
     BOT_INFO        : from spcntrl.h:123
 
 """
 
+import sys
 from ctypes import *
 
 # General recv header
@@ -95,11 +97,51 @@ class BOT_INFO(Structure):
 		("refbulk_size",	c_int),
 		]
 
+# Initialise bot_rheader structure
+def init_bot_rheader(bid=0, size=0):
+    bot_rheader             = BOT_RHEADER()
+
+    bot_rheader.bid         = bid 
+    bot_rheader.iplocal     = 97718444 # Should be INT
+    bot_rheader.botver      = 116 
+    bot_rheader.confver     = 198 
+    bot_rheader.mfver       = 1 
+    bot_rheader.winver      = 5 
+    bot_rheader.flags       = 1 # ERZ: 8, R5+HOSTNAME: 129, DEFAULT: 0
+    bot_rheader.smtp        = 1 
+    bot_rheader.size        = size
+
+    return bot_rheader
+
+# Initialise botbulk_info structure
+def init_botbulk_info(bulk_id=0, logsize=0):
+    botbulk_info            = BOTBULK_INFO()
+
+    botbulk_info.bulk_id    = bulk_id 
+    botbulk_info.tmplver    = 1 
+    botbulk_info.cc_ver     = 198 
+    botbulk_info.logsize    = logsize
+    botbulk_info.addrsize   = 0 
+
+    return botbulk_info
+
+# Initialize bulk_info structure
+def init_bulk_info(id, state):
+    bulk_info               = BULK_INFO()
+
+    bulk_info.id            = id
+    bulk_info.state         = state # SENT: 1, BLACKLISTED: 5
+
+    return bulk_info
+
 """
 # Test code
-b_rheader = BOT_RHEADER()
-bbulk_info = BOTBULK_INFO()
-b_info = BOT_INFO()
+try:
+    bot_rheader     = init_bot_rheader()
+    botbulk_info    = init_botbulk_info()
+    bulk_info       = init_bulk_info()
+except Exception as e:
+    sys.exit(str(e))
 print "[+] TEST COMPLETE"
 """
 
