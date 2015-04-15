@@ -95,6 +95,9 @@ def main():
     bid_registered = []     # BID of bots registered
     bid_not_registered = [] # BID of bots not registered
 
+    # Note: Max size of Python list is 536,870,912 elements (on a 32bit system).
+    # Warning: The larger the list is the slower the operations will be.
+
     # Show progress bar
     pbar = ProgressBar()
 

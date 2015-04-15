@@ -27,7 +27,7 @@ from c_types_defines import *
 from termcolor import cprint
 
 # Enable/Disable debug mode
-DBG = False
+DBG = True
 
 # C&C connection IP and Port number
 # Test: nc -l 8080 | hexdump -C
@@ -69,7 +69,7 @@ def init_socket(iface, timeout=None):
     return s
 
 # Generate server request
-def generate_package(bid=0, bulkstate=1):
+def generate_package(bid=0, bulkstate=1, dbg=False):
     # Generate bulk_info array
     bulk_info_array = ""
     for i in range(0, 2):
@@ -88,7 +88,7 @@ def generate_package(bid=0, bulkstate=1):
             + pencrypt(buffer(botbulk_info)[:] + bulk_info_array, bot_rheader.size)
 
     # Print package content
-    if DBG:
+    if dbg:
         cprint("BOT_RHEADER\n", "yellow"); print hexdump(buffer(bot_rheader)[:])
         cprint("BOTBULK_INFO\n", "yellow"); print hexdump(buffer(botbulk_info)[:])
         cprint("BULK_INFO\n", "yellow"); print hexdump(buffer(bulk_info_array)[:])
@@ -97,37 +97,41 @@ def generate_package(bid=0, bulkstate=1):
     return data
 
 # Process server response
-def process_package(rcvmsg, rtt=0):
+# The print_cmd parameter is set to False during DoS attacks, to avoid
+# printing out server response status unnecessarily.
+def process_package(rcvmsg, rtt=0, dbg=False, print_cmd=True):
     # Interpret RC command (1-9)
     cmd = struct.unpack("i", rcvmsg[0:4])[0] # struct.unpack() returns a tuple
 
     if cmd in range(1,10):
-        sys.stdout.write("[+] Received (RTT: " + str(rtt * 1000) \
+        if print_cmd:
+            sys.stdout.write("[+] Received (RTT: " + str(rtt * 1000) \
                 + "ms, Pkg size: " + str(len(rcvmsg)) + "): ")
 
-    if   cmd == RC_SLEEP:
-        cprint("RC_SLEEP",      "cyan")
-    elif cmd == RC_GETWORK:
-        cprint("RC_GETWORK",    "cyan")
-    elif cmd == RC_RESTART:
-        cprint("RC_RESTART",    "cyan")
-    elif cmd == RC_UPDATE:
-        cprint("RC_UPDATE",     "cyan")
-    elif cmd == RC_BID:
-        cprint("RC_BID",        "cyan")
-    elif cmd == RC_TEMPLATE:
-        cprint("RC_TEMPLATE",   "cyan")
-    elif cmd == RC_CONFIG:
-        cprint("RC_CONFIG",     "cyan")
-    elif cmd == RC_MAILFROM:
-        cprint("RC_MAILFROM",   "cyan")
-    elif cmd == RC_ACCOUNTS:
-        cprint("RC_ACCOUNTS",   "cyan")
+    if print_cmd:
+        if   cmd == RC_SLEEP:
+            cprint("RC_SLEEP",      "cyan")
+        elif cmd == RC_GETWORK:
+            cprint("RC_GETWORK",    "cyan")
+        elif cmd == RC_RESTART:
+            cprint("RC_RESTART",    "cyan")
+        elif cmd == RC_UPDATE:
+            cprint("RC_UPDATE",     "cyan")
+        elif cmd == RC_BID:
+            cprint("RC_BID",        "cyan")
+        elif cmd == RC_TEMPLATE:
+            cprint("RC_TEMPLATE",   "cyan")
+        elif cmd == RC_CONFIG:
+            cprint("RC_CONFIG",     "cyan")
+        elif cmd == RC_MAILFROM:
+            cprint("RC_MAILFROM",   "cyan")
+        elif cmd == RC_ACCOUNTS:
+            cprint("RC_ACCOUNTS",   "cyan")
 
     # Decrypt data received
     if len(rcvmsg) > 8:
         dec = pdecrypt(rcvmsg[8:], len(rcvmsg[8:]))
-        if DBG:
+        if dbg:
             cprint("Decrypted:\n" + hexdump(dec), "yellow")
 
     # Command actions
@@ -138,14 +142,14 @@ def process_package(rcvmsg, rtt=0):
         # Extract sign.timer from the decrypted data
         timer = struct.unpack("i", dec[8:12])[0]
 
-        if DBG:
+        if dbg:
             cprint("[+] Assigned BID: " + str(bid) \
                     + ", Timer: " + str(timer), "green")
 
         return bid
 
 # Communicate with the botnet C&C server
-def communicate(s):
+def communicate(s, dbg=False, print_cmd=True):
     # Initialise recv buffer
     buf = ""
 
@@ -153,15 +157,15 @@ def communicate(s):
     bid = 0
 
     # Send initial server request
-    if DBG:
+    if dbg:
         cprint("\n[*] Sending server request to " + HOST + ": " \
                 + str(PORT) + " (hexdump below)", "green")
 
-    data = generate_package(bid)
+    data = generate_package(bid, dbg=dbg)
     start = time.time() # Start timer
     s.sendall(data)
 
-    if DBG:
+    if dbg:
         cprint("[+] Sent! Now waiting to receive data...", "green")
 
     # Listen for server response
@@ -184,7 +188,7 @@ def communicate(s):
 
             # Process contents of recv buffer (if not empty)
             if buf:
-                tmp = process_package(buf, rtt)
+                tmp = process_package(buf, rtt, dbg=dbg, print_cmd=print_cmd)
 
                 # Received RC_BID: update BID field
                 if tmp:
@@ -193,9 +197,9 @@ def communicate(s):
                 time.sleep(1)
 
                 # Generate server request
-                if DBG:
+                if dbg:
                     cprint("\n[*] Sending server request...", "green")
-                data = generate_package(bid)
+                data = generate_package(bid, dbg=dbg)
 
                 # Restart timer and send data
                 start = time.time()
@@ -203,7 +207,7 @@ def communicate(s):
 
                 # Clear recv buffer
                 buf = ""
-                if DBG:
+                if dbg:
                     cprint("\n[*] Listening for incoming data...\t(press Ctrl+C to quit)" \
                         , "green")
 
@@ -218,7 +222,7 @@ def main():
     s = init_socket(IFACE, TIMEOUT)
 
     # Start communication with the C&C server
-    communicate(s)
+    communicate(s, dbg=DBG)
 
     # Close socket
     s.close()

