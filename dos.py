@@ -36,10 +36,11 @@ from subprocess import call
 
 # Enable/Disable debug mode
 DBG         = False
-PRINT_CMD   = True
+PRINT_CMD   = False
 
 # Bot network interface
 IFACE = "eth0"
+#IFACE = "vmnet8"
 TIMEOUT = 1
 
 # C&C connection IP and Port number
