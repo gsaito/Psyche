@@ -149,7 +149,7 @@ def process_package(rcvmsg, rtt=0, dbg=False, print_cmd=True):
         return bid
 
 # Communicate with the botnet C&C server
-def communicate(s, dbg=False, print_cmd=True):
+def communicate(s, dbg=False, print_cmd=True, timeout=0):
     # Initialise recv buffer
     buf = ""
 
@@ -184,7 +184,7 @@ def communicate(s, dbg=False, print_cmd=True):
         except socket.timeout:
             # Timed out on receiving data:
             end = time.time() # Stop timer
-            rtt = end - start - TIMEOUT # Calculate server response time
+            rtt = end - start - timeout # Calculate server response time
 
             # Process contents of recv buffer (if not empty)
             if buf:
@@ -222,7 +222,7 @@ def main():
     s = init_socket(IFACE, TIMEOUT)
 
     # Start communication with the C&C server
-    communicate(s, dbg=DBG)
+    communicate(s, dbg=DBG, timeout=TIMEOUT)
 
     # Close socket
     s.close()

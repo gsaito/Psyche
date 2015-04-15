@@ -36,7 +36,7 @@ from subprocess import call
 
 # Enable/Disable debug mode
 DBG         = False
-PRINT_CMD   = False
+PRINT_CMD   = True
 
 # Bot network interface
 IFACE = "eth0"
@@ -69,7 +69,12 @@ def init_iface(iface):
     rand2 = str(random.randint(0,255))
     rand3 = str(random.randint(0,254))
     ip = "10." + rand1 + "." + rand2 + "." + rand3
-    call(["ifconfig", iface, ip])
+    
+    try:
+        call(["ifconfig", iface, ip])
+    except Exception as e:
+        # Try again with a different IP
+        init_iface(iface)
 
     return ip
 
@@ -77,7 +82,7 @@ def init_iface(iface):
 def add_bot(iface):
     global BOT_NUM
     s = init_socket(iface, TIMEOUT)
-    communicate(s, dbg=DBG, print_cmd=PRINT_CMD)
+    communicate(s, dbg=DBG, print_cmd=PRINT_CMD, timeout=TIMEOUT)
     s.close()
 
     with lock:
@@ -170,12 +175,14 @@ def main():
             cprint("[-] " + str(e), "red")
             break
 
+    # Bring interfaces down
+    ifconfig_down(iface_count)
+
+    """
     # Wait for all threads to terminate
     for thread in threads:
         thread.join()
-
-    # Bring interfaces down
-    ifconfig_down(iface_count)
+    """
 
 
 if __name__ == "__main__":
