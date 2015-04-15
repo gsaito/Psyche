@@ -27,7 +27,7 @@ from c_types_defines import *
 from termcolor import cprint
 
 # Enable/Disable debug mode
-DBG = True
+DBG = False
 
 # C&C connection IP and Port number
 # Test: nc -l 8080 | hexdump -C

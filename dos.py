@@ -160,7 +160,7 @@ def main():
             iface_count += 1
 
             # Print status
-            print_status(ip, iface)
+            #print_status(ip, iface)
 
         except KeyboardInterrupt:
             print "[-] KeyboardInterrupt: executing exit routine..."
