@@ -39,8 +39,8 @@ DBG         = False
 PRINT_CMD   = False
 
 # Bot network interface
-IFACE = "eth0"
-#IFACE = "vmnet8"
+#IFACE = "eth0"
+IFACE = "vmnet8"
 TIMEOUT = 1
 
 # C&C connection IP and Port number

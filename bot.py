@@ -64,7 +64,10 @@ def init_socket(iface, timeout=None):
     try:
         s.connect((HOST, PORT))
     except socket.error as e:
-        sys.exit(str(e))
+        #sys.exit(str(e))
+
+        # Try again
+        init_socket(iface, timeout)
 
     return s
 
